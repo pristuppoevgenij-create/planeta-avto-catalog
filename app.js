@@ -36,7 +36,7 @@ async function loadAllVehicles() {
     const res = await fetch(`${API_URL}/api/vehicles`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pageSize: 1000 }),
+      body: JSON.stringify({}),
     });
     const data = await res.json();
     allVehicles = data.data?.vehicles || [];
