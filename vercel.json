@@ -1,5 +1,8 @@
 {
   "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": { "maxDuration": 60 }
+  },
   "rewrites": [
     { "source": "/api/vehicles/:id", "destination": "/api/vehicles/[id]" },
     { "source": "/api/vehicles", "destination": "/api/vehicles" }
