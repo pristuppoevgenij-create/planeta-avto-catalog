@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Планета Авто — Каталог автомобилей с пробегом</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#1B3A6B">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <div class="logo-text">Планета Авто<br><span class="logo-sub">Автомобили с пробегом</span></div>
+    </a>
+    <a href="tel:+73512001234" class="header-phone">Позвонить</a>
+  </div>
+</header>
+
+<div class="hero-count">
+  <strong id="total-count">…</strong>
+  автомобилей в наличии
+</div>
+
+<div class="page">
+
+  <!-- Фильтры -->
+  <div class="filters">
+    <div class="filters-title">Подбор автомобиля</div>
+    <div class="filters-grid">
+      <div class="filter-group" style="grid-column: span 2">
+        <label>Марка</label>
+        <select id="filter-brand">
+          <option value="">Все марки</option>
+        </select>
+      </div>
+      <div class="filter-group" style="grid-column: span 2">
+        <label>Тип кузова</label>
+        <select id="filter-body">
+          <option value="">Все типы</option>
+          <option value="sedan">Седан</option>
+          <option value="suv">Внедорожник / SUV</option>
+          <option value="hatchback">Хэтчбек</option>
+          <option value="universal">Универсал</option>
+          <option value="liftback">Лифтбек</option>
+          <option value="minivan">Минивэн</option>
+          <option value="coupe">Купе</option>
+          <option value="compactvan">Компактвэн</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Год от</label>
+        <select id="filter-year-from">
+          <option value="">Любой</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Год до</label>
+        <select id="filter-year-to">
+          <option value="">Любой</option>
+        </select>
+      </div>
+      <div class="filter-group" style="grid-column: span 2">
+        <label>Цена (₽)</label>
+        <div class="price-range">
+          <input type="number" id="filter-price-from" placeholder="От" min="0" step="10000">
+          <span>—</span>
+          <input type="number" id="filter-price-to" placeholder="До" min="0" step="10000">
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>КПП</label>
+        <select id="filter-gearbox">
+          <option value="">Любая</option>
+          <option value="automatic">Автомат</option>
+          <option value="manual">Механика</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Привод</label>
+        <select id="filter-drive">
+          <option value="">Любой</option>
+          <option value="front">Передний</option>
+          <option value="rear">Задний</option>
+          <option value="full_4wd">Полный</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button class="btn-filter" onclick="applyFilters()">Найти</button>
+      <button class="btn-reset" onclick="resetFilters()">Сброс</button>
+    </div>
+  </div>
+
+  <!-- Сортировка -->
+  <div class="sort-bar">
+    <span class="result-count" id="result-count"></span>
+    <select id="sort-select" onchange="applyFilters()">
+      <option value="price_asc">Цена ↑</option>
+      <option value="price_desc">Цена ↓</option>
+      <option value="year_desc">Новее</option>
+      <option value="year_asc">Старше</option>
+      <option value="mileage_asc">Пробег ↑</option>
+    </select>
+  </div>
+
+  <!-- Карточки -->
+  <div class="cars-grid" id="cars-grid">
+    <div class="loading" style="grid-column: span 2">
+      <div class="loading-spinner"></div>
+      Загружаем каталог…
+    </div>
+  </div>
+
+  <div class="load-more-wrap" id="load-more-wrap" style="display:none">
+    <button class="btn-load-more" onclick="loadMore()">Показать ещё</button>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Планета Авто</strong><br>
+  Автомобили с пробегом · Челябинск
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
