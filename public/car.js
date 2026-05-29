@@ -25,10 +25,6 @@ function engineLiters(cc) {
   return cc ? (cc / 1000).toFixed(1) + ' л' : '—';
 }
 
-const API_URL = window.location.hostname === 'localhost'
-  ? ''
-  : 'https://planeta-avto-api.pristuppoevgenij.workers.dev';
-
 const params = new URLSearchParams(location.search);
 const vehicleId = params.get('id');
 
@@ -40,10 +36,11 @@ async function loadVehicle() {
   if (!vehicleId) { page.innerHTML = '<div class="loading">Авто не указано</div>'; return; }
 
   try {
-    const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}`);
+    const res = await fetch('/vehicles.json');
     const data = await res.json();
-    if (!data.data) throw new Error('Не найдено');
-    renderVehicle(data.data);
+    const vehicle = (data.data?.vehicles || []).find(v => String(v.id) === vehicleId);
+    if (!vehicle) throw new Error('Не найдено');
+    renderVehicle(vehicle);
   } catch (e) {
     page.innerHTML = `<div class="loading" style="color:#e53e3e">Ошибка загрузки.<br><small>${e.message}</small></div>`;
   }
