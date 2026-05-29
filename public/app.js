@@ -1,3 +1,7 @@
+const API_URL = window.location.hostname === 'localhost'
+  ? ''
+  : 'https://planeta-avto-api.pristuppoevgenij.workers.dev';
+
 // Все данные загружаются один раз, фильтрация на клиенте
 let allVehicles = [];
 let filtered = [];
@@ -29,7 +33,7 @@ function engineLiters(cc) {
 async function loadAllVehicles() {
   const grid = document.getElementById('cars-grid');
   try {
-    const res = await fetch('/api/vehicles', {
+    const res = await fetch(`${API_URL}/api/vehicles`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pageSize: 1000 }),

@@ -25,6 +25,10 @@ function engineLiters(cc) {
   return cc ? (cc / 1000).toFixed(1) + ' л' : '—';
 }
 
+const API_URL = window.location.hostname === 'localhost'
+  ? ''
+  : 'https://planeta-avto-api.pristuppoevgenij.workers.dev';
+
 const params = new URLSearchParams(location.search);
 const vehicleId = params.get('id');
 
@@ -36,7 +40,7 @@ async function loadVehicle() {
   if (!vehicleId) { page.innerHTML = '<div class="loading">Авто не указано</div>'; return; }
 
   try {
-    const res = await fetch(`/api/vehicles/${vehicleId}`);
+    const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}`);
     const data = await res.json();
     if (!data.data) throw new Error('Не найдено');
     renderVehicle(data.data);
