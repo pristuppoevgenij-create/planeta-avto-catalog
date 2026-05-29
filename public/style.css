@@ -110,9 +110,11 @@ header {
   padding-right: 28px;
 }
 .filter-group input { background-image: none; }
-.price-range { display: flex; gap: 6px; align-items: center; }
-.price-range input { flex: 1; }
-.price-range span { color: var(--text-muted); font-size: 12px; }
+.filter-full { grid-column: span 2; }
+@media (max-width: 480px) { .filter-full { grid-column: span 1; } }
+.price-range { display: flex; gap: 6px; align-items: center; overflow: hidden; }
+.price-range input { flex: 1; min-width: 0; }
+.price-range span { color: var(--text-muted); font-size: 12px; flex-shrink: 0; }
 .filter-actions { margin-top: 12px; display: flex; gap: 8px; }
 .btn-filter {
   flex: 1;
