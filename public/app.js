@@ -76,6 +76,8 @@ function getFilters() {
     yearTo: +document.getElementById('filter-year-to').value || 9999,
     priceFrom: +document.getElementById('filter-price-from').value || 0,
     priceTo: +document.getElementById('filter-price-to').value || Infinity,
+    mileageFrom: (+document.getElementById('filter-mileage-from').value || 0) * 1000,
+    mileageTo: (+document.getElementById('filter-mileage-to').value || Infinity) * 1000,
     gearbox: document.getElementById('filter-gearbox').value,
     drive: document.getElementById('filter-drive').value,
     sort: document.getElementById('sort-select').value,
@@ -93,6 +95,8 @@ function applyFilters() {
     if (f.yearTo < 9999 && v.year > f.yearTo) return false;
     if (f.priceFrom && v.price < f.priceFrom) return false;
     if (f.priceTo < Infinity && v.price > f.priceTo) return false;
+    if (f.mileageFrom && (v.mileage || 0) < f.mileageFrom) return false;
+    if (f.mileageTo < Infinity && (v.mileage || 0) > f.mileageTo) return false;
     if (f.gearbox && v.gearboxType !== f.gearbox) return false;
     if (f.drive && v.driveType !== f.drive) return false;
     return true;
@@ -118,6 +122,8 @@ function resetFilters() {
   });
   document.getElementById('filter-price-from').value = '';
   document.getElementById('filter-price-to').value = '';
+  document.getElementById('filter-mileage-from').value = '';
+  document.getElementById('filter-mileage-to').value = '';
   applyFilters();
 }
 
