@@ -12,7 +12,7 @@ import sys
 
 PORT = int(os.environ.get('PORT', 3000))
 API_BASE = 'https://api.maxposter.ru/partners-api'
-AUTH = 'Basic UGxhbmV0YUF1dG9DaGVseWFiaW5za0BtYXhwb3N0ZXIucnU6dzl1PUdNUG1jfg=='
+AUTH = os.environ.get('MAXPOSTER_TOKEN', 'Basic UGxhbmV0YUF1dG9DaGVseWFiaW5za0BtYXhwb3N0ZXIucnU6dzl1PUdNUG1jfg==')
 PUBLIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public')
 
 MIME = {
