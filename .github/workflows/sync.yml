@@ -1,0 +1,76 @@
+name: Sync vehicles from Autohub
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch vehicles from MaxPoster API
+        run: |
+          python3 - <<'PYEOF'
+          import urllib.request
+          import json
+
+          TOKEN = "Basic UGxhbmV0YUF1dG9DaGVseWFiaW5za0BtYXhwb3N0ZXIucnU6dzl1PUdNUG1jfg=="
+          API = "https://api.maxposter.ru/partners-api/vehicles/active"
+          DEALER_FILTER = [{"fields": ["dealer"], "type": "in", "value": [9433, 10014]}]
+
+          def fetch_page(offset):
+              body = json.dumps({"limit": 100, "offset": offset, "filters": DEALER_FILTER}).encode()
+              req = urllib.request.Request(API, data=body, headers={
+                  "Authorization": TOKEN,
+                  "Content-Type": "application/json"
+              }, method="POST")
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.loads(r.read())
+
+          first = fetch_page(0)
+          total = first["data"]["meta"]["range"]["total"]
+          pages = (total + 99) // 100
+          vehicles = first["data"]["vehicles"]
+
+          for i in range(1, pages):
+              page = fetch_page(i * 100)
+              vehicles += page["data"]["vehicles"]
+
+          slim = []
+          for v in vehicles:
+              slim.append({
+                  "id": v.get("id"),
+                  "price": v.get("price"),
+                  "year": v.get("year"),
+                  "mileage": v.get("mileage"),
+                  "bodyType": v.get("bodyType"),
+                  "gearboxType": v.get("gearboxType"),
+                  "driveType": v.get("driveType"),
+                  "engineVolume": v.get("engineVolume"),
+                  "enginePower": v.get("enginePower"),
+                  "engineType": v.get("engineType"),
+                  "bodyColor": v.get("bodyColor"),
+                  "description": v.get("description"),
+                  "brand": v.get("brand"),
+                  "model": v.get("model"),
+                  "photos": (v.get("photos") or [])[:5],
+                  "dealer": {"id": v["dealer"]["id"], "companyName": v["dealer"]["companyName"]} if v.get("dealer") else None
+              })
+
+          result = {"status": "success", "data": {"vehicles": slim, "pagination": {"total": len(slim)}}}
+          with open("public/vehicles.json", "w", encoding="utf-8") as f:
+              json.dump(result, f, ensure_ascii=False)
+
+          print(f"Saved {len(slim)} vehicles")
+          PYEOF
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/vehicles.json
+          git diff --cached --quiet || git commit -m "sync: update vehicles from Autohub"
+          git push
