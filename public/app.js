@@ -55,6 +55,24 @@ function populateBrands() {
   });
 }
 
+function onBrandChange() {
+  const brandId = document.getElementById('filter-brand').value;
+  const sel = document.getElementById('filter-model');
+  sel.innerHTML = '<option value="">Все модели</option>';
+  if (brandId) {
+    const models = {};
+    allVehicles.filter(v => String(v.brand?.id) === brandId)
+      .forEach(v => { if (v.model?.id) models[v.model.id] = v.model.name; });
+    Object.entries(models).sort((a, b) => a[1].localeCompare(b[1], 'ru')).forEach(([id, name]) => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    });
+  }
+  applyFilters();
+}
+
 function populateYears() {
   const years = [...new Set(allVehicles.map(v => v.year).filter(Boolean))].sort((a, b) => b - a);
   ['filter-year-from', 'filter-year-to'].forEach(id => {
@@ -71,6 +89,7 @@ function populateYears() {
 function getFilters() {
   return {
     brand: document.getElementById('filter-brand').value,
+    model: document.getElementById('filter-model').value,
     body: document.getElementById('filter-body').value,
     yearFrom: +document.getElementById('filter-year-from').value || 0,
     yearTo: +document.getElementById('filter-year-to').value || 9999,
@@ -90,6 +109,7 @@ function applyFilters() {
 
   filtered = allVehicles.filter(v => {
     if (f.brand && String(v.brand?.id) !== f.brand) return false;
+    if (f.model && String(v.model?.id) !== f.model) return false;
     if (f.body && v.bodyType !== f.body) return false;
     if (f.yearFrom && v.year < f.yearFrom) return false;
     if (f.yearTo < 9999 && v.year > f.yearTo) return false;
@@ -117,9 +137,10 @@ function applyFilters() {
 }
 
 function resetFilters() {
-  ['filter-brand','filter-body','filter-year-from','filter-year-to','filter-gearbox','filter-drive'].forEach(id => {
+  ['filter-brand','filter-model','filter-body','filter-year-from','filter-year-to','filter-gearbox','filter-drive'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.getElementById('filter-model').innerHTML = '<option value="">Все модели</option>';
   document.getElementById('filter-price-from').value = '';
   document.getElementById('filter-price-to').value = '';
   document.getElementById('filter-mileage-from').value = '';
