@@ -30,6 +30,17 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Лайтбокс -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); lightboxNav(-1)">‹</button>
+  <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); lightboxNav(1)">›</button>
+  <div class="lightbox-img-wrap" id="lightbox-img-wrap">
+    <img class="lightbox-img" id="lightbox-img" src="" alt="">
+  </div>
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+</div>
+
 <script src="car.js"></script>
 </body>
 </html>
