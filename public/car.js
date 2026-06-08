@@ -66,7 +66,7 @@ function renderVehicle(v) {
   page.innerHTML = `
     ${photos.length > 0 ? `
     <div class="gallery-wrap">
-      <img class="gallery-main-photo" id="gallery-main" src="${photos[0].url}" alt="${name}">
+      <img class="gallery-main-photo" id="gallery-main" src="${photos[0].url}" alt="${name}" onclick="openLightbox(${0})" style="cursor:zoom-in">
       <div class="gallery-counter" id="gallery-counter">1 / ${photos.length}</div>
       ${photos.length > 1 ? `
         <button class="gallery-nav prev" onclick="changePhoto(-1)">‹</button>
@@ -75,7 +75,7 @@ function renderVehicle(v) {
     </div>
     ${photos.length > 1 ? `
     <div class="gallery-thumbs" id="gallery-thumbs">
-      ${photos.map((p, i) => `<img class="gallery-thumb ${i===0?'active':''}" src="${p.url}" onclick="setPhoto(${i})" loading="lazy">`).join('')}
+      ${photos.map((p, i) => `<img class="gallery-thumb ${i===0?'active':''}" src="${p.url}" onclick="setPhoto(${i})" ondblclick="openLightbox(${i})" loading="lazy" style="cursor:zoom-in">`).join('')}
     </div>` : ''}
     ` : `<div class="car-photo-placeholder" style="aspect-ratio:16/9">🚗</div>`}
 
@@ -171,5 +171,94 @@ function showToast(msg) {
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+/* ===== ЛАЙТБОКС С ЗУМОМ ===== */
+let lbIdx = 0, lbScale = 1, lbStartDist = 0, lbStartScale = 1;
+let lbDragStart = null, lbTranslate = {x:0, y:0};
+
+function openLightbox(idx) {
+  lbIdx = idx; lbScale = 1; lbTranslate = {x:0, y:0};
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  img.src = photos[idx].url;
+  img.style.transform = 'scale(1) translate(0,0)';
+  document.getElementById('lightbox-counter').textContent = `${idx+1} / ${photos.length}`;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setupLightboxGestures();
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lightboxNav(dir) {
+  lbIdx = (lbIdx + dir + photos.length) % photos.length;
+  lbScale = 1; lbTranslate = {x:0, y:0};
+  const img = document.getElementById('lightbox-img');
+  img.src = photos[lbIdx].url;
+  img.style.transform = 'scale(1) translate(0,0)';
+  document.getElementById('lightbox-counter').textContent = `${lbIdx+1} / ${photos.length}`;
+}
+
+function applyTransform() {
+  const img = document.getElementById('lightbox-img');
+  img.style.transform = `scale(${lbScale}) translate(${lbTranslate.x/lbScale}px, ${lbTranslate.y/lbScale}px)`;
+}
+
+function setupLightboxGestures() {
+  const wrap = document.getElementById('lightbox-img-wrap');
+  wrap.ontouchstart = null; wrap.ontouchmove = null; wrap.ontouchend = null;
+
+  let swipeStartX = 0;
+
+  wrap.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      lbStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      lbStartScale = lbScale;
+    } else if (e.touches.length === 1) {
+      swipeStartX = e.touches[0].clientX;
+      lbDragStart = lbScale > 1 ? {x: e.touches[0].clientX - lbTranslate.x, y: e.touches[0].clientY - lbTranslate.y} : null;
+    }
+  }, {passive: true});
+
+  wrap.addEventListener('touchmove', e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      lbScale = Math.min(5, Math.max(1, lbStartScale * dist / lbStartDist));
+      if (lbScale === 1) lbTranslate = {x:0, y:0};
+      applyTransform();
+    } else if (e.touches.length === 1 && lbDragStart && lbScale > 1) {
+      e.preventDefault();
+      lbTranslate = {x: e.touches[0].clientX - lbDragStart.x, y: e.touches[0].clientY - lbDragStart.y};
+      applyTransform();
+    }
+  }, {passive: false});
+
+  wrap.addEventListener('touchend', e => {
+    if (e.changedTouches.length === 1 && lbScale <= 1) {
+      const dx = e.changedTouches[0].clientX - swipeStartX;
+      if (Math.abs(dx) > 60) lightboxNav(dx < 0 ? 1 : -1);
+    }
+    if (lbScale < 1) { lbScale = 1; lbTranslate = {x:0,y:0}; applyTransform(); }
+  }, {passive: true});
+
+  // Двойной тап — сброс зума
+  let lastTap = 0;
+  wrap.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTap < 300) { lbScale = 1; lbTranslate = {x:0,y:0}; applyTransform(); }
+    lastTap = now;
+  }, {passive: true});
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
+  if (e.key === 'ArrowRight') lightboxNav(1);
+});
 
 loadVehicle();
