@@ -86,11 +86,16 @@ function populateYears() {
   });
 }
 
+function carStatus(v) {
+  return (v.photos && v.photos.length > 0) ? 'sale' : 'prep';
+}
+
 function getFilters() {
   return {
     brand: document.getElementById('filter-brand').value,
     model: document.getElementById('filter-model').value,
     body: document.getElementById('filter-body').value,
+    status: document.getElementById('filter-status').value,
     yearFrom: +document.getElementById('filter-year-from').value || 0,
     yearTo: +document.getElementById('filter-year-to').value || 9999,
     priceFrom: +document.getElementById('filter-price-from').value.replace(/\D/g,'') || 0,
@@ -117,6 +122,7 @@ function applyFilters() {
     if (f.priceTo < Infinity && v.price > f.priceTo) return false;
     if (f.mileageFrom && (v.mileage || 0) < f.mileageFrom) return false;
     if (f.mileageTo < Infinity && (v.mileage || 0) > f.mileageTo) return false;
+    if (f.status && carStatus(v) !== f.status) return false;
     if (f.gearbox && v.gearboxType !== f.gearbox) return false;
     if (f.drive && v.driveType !== f.drive) return false;
     return true;
@@ -137,7 +143,7 @@ function applyFilters() {
 }
 
 function resetFilters() {
-  ['filter-brand','filter-model','filter-body','filter-year-from','filter-year-to','filter-gearbox','filter-drive'].forEach(id => {
+  ['filter-brand','filter-model','filter-body','filter-status','filter-year-from','filter-year-to','filter-gearbox','filter-drive'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('filter-model').innerHTML = '<option value="">Все модели</option>';
@@ -168,6 +174,7 @@ function renderCars() {
 
 function carCard(v) {
   const photo = v.photos?.[0]?.url || null;
+  const inSale = photo !== null;
   const name = `${v.brand?.name || ''} ${v.model?.name || ''}`.trim();
   const yearKm = [v.year, v.mileage ? formatMileage(v.mileage) : null].filter(Boolean).join(' · ');
   const body = BODY_TYPES[v.bodyType] || v.bodyType || '';
@@ -176,10 +183,13 @@ function carCard(v) {
     ${photo
       ? `<img class="car-photo" src="${photo}" alt="${name}" loading="lazy">`
       : `<div class="car-photo-placeholder">🚗</div>`}
+    <div class="car-status-badge ${inSale ? 'status-sale' : 'status-prep'}">
+      ${inSale ? 'В продаже' : 'В подготовке'}
+    </div>
     <div class="car-info">
       <div class="car-name">${name}</div>
       <div class="car-year-km">${yearKm}</div>
-      <div class="car-price">${formatPrice(v.price)}</div>
+      ${inSale ? `<div class="car-price">${formatPrice(v.price)}</div>` : ''}
       ${body ? `<div class="car-badge">${body}</div>` : ''}
     </div>
   </a>`;
