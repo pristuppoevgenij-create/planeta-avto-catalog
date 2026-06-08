@@ -31,8 +31,14 @@
     <div class="filters-grid">
       <div class="filter-group" style="grid-column: span 2">
         <label>Марка</label>
-        <select id="filter-brand">
+        <select id="filter-brand" onchange="onBrandChange()">
           <option value="">Все марки</option>
+        </select>
+      </div>
+      <div class="filter-group" style="grid-column: span 2">
+        <label>Модель</label>
+        <select id="filter-model">
+          <option value="">Все модели</option>
         </select>
       </div>
       <div class="filter-group" style="grid-column: span 2">
