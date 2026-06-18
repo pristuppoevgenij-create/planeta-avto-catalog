@@ -13,8 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch vehicles from MaxPoster API
         run: |
@@ -59,10 +57,10 @@ jobs:
                   "engineType": v.get("engineType"),
                   "bodyColor": v.get("bodyColor"),
                   "description": v.get("description"),
+                  "acquisitionDate": v.get("acquisitionDate"),
                   "brand": v.get("brand"),
                   "model": v.get("model"),
                   "photos": (v.get("photos") or [])[:5],
-                  "acquisitionDate": v.get("acquisitionDate"),
                   "dealer": {"id": v["dealer"]["id"], "companyName": v["dealer"]["companyName"]} if v.get("dealer") else None
               })
 
@@ -73,11 +71,7 @@ jobs:
           print(f"Saved {len(slim)} vehicles")
           PYEOF
 
-      - name: Commit and push if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
-          git add public/vehicles.json
-          git diff --cached --quiet || git commit -m "sync: update vehicles from Autohub"
-          git push
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "sync: update vehicles from Autohub"
+          file_pattern: public/vehicles.json
