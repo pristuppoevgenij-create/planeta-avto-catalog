@@ -119,10 +119,12 @@
   <div class="sort-bar">
     <span class="result-count" id="result-count"></span>
     <select id="sort-select" onchange="applyFilters()">
+      <option value="date_desc">Сначала новые</option>
+      <option value="date_asc">Сначала старые</option>
       <option value="price_asc">Цена ↑</option>
       <option value="price_desc">Цена ↓</option>
-      <option value="year_desc">Новее</option>
-      <option value="year_asc">Старше</option>
+      <option value="year_desc">Год ↓</option>
+      <option value="year_asc">Год ↑</option>
       <option value="mileage_asc">Пробег ↑</option>
     </select>
   </div>
