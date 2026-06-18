@@ -135,7 +135,9 @@ function applyFilters() {
     if (f.sort === 'year_desc') return (b.year || 0) - (a.year || 0);
     if (f.sort === 'year_asc') return (a.year || 0) - (b.year || 0);
     if (f.sort === 'mileage_asc') return (a.mileage || 999999) - (b.mileage || 999999);
-    return 0;
+    if (f.sort === 'date_desc') return (b.acquisitionDate || '').localeCompare(a.acquisitionDate || '');
+    if (f.sort === 'date_asc') return (a.acquisitionDate || '').localeCompare(b.acquisitionDate || '');
+    return (b.acquisitionDate || '').localeCompare(a.acquisitionDate || '');
   });
 
   document.getElementById('result-count').textContent = `Найдено: ${filtered.length}`;
