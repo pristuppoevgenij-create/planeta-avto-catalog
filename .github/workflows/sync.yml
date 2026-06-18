@@ -62,6 +62,7 @@ jobs:
                   "brand": v.get("brand"),
                   "model": v.get("model"),
                   "photos": (v.get("photos") or [])[:5],
+                  "acquisitionDate": v.get("acquisitionDate"),
                   "dealer": {"id": v["dealer"]["id"], "companyName": v["dealer"]["companyName"]} if v.get("dealer") else None
               })
 
